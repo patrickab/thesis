@@ -8,7 +8,7 @@ def acquisition_mes(drag, lift, gpModel, candidate_solution):
 
     Note: 
         simplified input values 
-            (drag, lift):
+            (drag, lift):               // extract variables from generate_xfouil_output.py
                 here:     2x1 matrices
                 original: 2xN matrices
             (candidate_solution):
@@ -20,7 +20,7 @@ def acquisition_mes(drag, lift, gpModel, candidate_solution):
             predValue -> acq_behavior  
 
     Inputs: 
-        drag                : (mean, variance)   ->  (Luftwiderstand)
+        drag                : (mean, variance)   ->  (Luftwiderstand) ; found in 
         lift                : (mean, variance)   ->  (Auftrieb)
         gpModel             : result from train_gp()
         candidate_solutions : tensor struct of candidate solutions
@@ -36,6 +36,5 @@ def acquisition_mes(drag, lift, gpModel, candidate_solution):
 
     acq_fitness  = botorch.acquisition.qMaxValueEntropy(gpModel, candidate_solution)
     acq_behavior = [drag[0], lift[0]]
-
 
     return acq_fitness, acq_behavior
