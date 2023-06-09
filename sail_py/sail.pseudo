@@ -1,0 +1,41 @@
+EVALUATION_BUDGET    = 1000
+SIZE_INITIAL_ARCHIVE = 50
+PARALLEL_BATCH_SIZE  = 10
+SOLUTION_SPACE = [
+    dim1 = define_dimension([0 ; 100], 10),
+    dim2 = define_dimension([-42; 42],  4),
+    dim3 = define_dimension([123;456], 78)
+]
+
+function define_dimension(interval, n_bins){
+    // Split dimension into n equally sized bins
+}
+
+function sail(){
+
+    // 1: Generate initial solutions & train GP Model 
+    solution_archive    = sobol_sequence(SOLUTION_SPACE, SIZE_INITIAL_ARCHIVE)
+    performance_archive = evaluate_performance(solution_archive)
+    gp_model            = train_gp(solution_archive, performance_archive)
+
+    EVALUATION_BUDGET   -= SIZE_INITIAL_ARCHIVE   //   Decrease evaluation budget
+
+    // 2: Produce Acquisition Map   ->   contains (behavior_x, adquisition_value_x)
+    while (EVALUATION_BUDGET - PARALLEL_BATCH_SIZE >= 0){
+        
+        acquisition_map      = map_elites(acquisition_mes(), solution_archive)       // Calculate elite aquisition solutions for each bin
+
+        x_new                = sobol_select(acquisition_map, PARALLEL_BATCH_SIZE)               // Select elites
+        solution_archive    += x_new                                                            // Add elites to archive
+
+        performance_archive += evaluate_performance(x_new)                                      // Evaluate elites
+        EVALUATION_BUDGET   -= PARALLEL_BATCH_SIZE                                              // Decrease evaluation budget
+        gp_model             = train_gp(solution_archive, performance_archive)                  // Train GP
+
+    }
+
+    // 3: Produce Prediction Map   ->   contains (behavior_x, predicition_x)
+    prediction() = mean(gp_model)
+    prediction_map = map_elites(prediction(), solution_archive)
+
+}
