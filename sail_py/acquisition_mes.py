@@ -1,4 +1,7 @@
+import torch
 import botorch
+from botorch.optim import optimize_acqf
+
 
 def acquisition_mes(drag, lift, gpModel, candidate_solution):
     """
@@ -33,6 +36,37 @@ def acquisition_mes(drag, lift, gpModel, candidate_solution):
         acq_behavior : 
             Predicted drag force (mean and variance)
     """
+
+    def fitnessFunction(children):
+    # Convert children to tensors
+    X = torch.tensor(children)
+
+    # Evaluate the fitness of each child using your custom fitness function
+    fitness = your_custom_fitness_function(X)
+
+    # Convert the fitness tensor to a numpy array
+    fitness = fitness.detach().numpy()
+
+    # Define the BoTorch model using the fitness values
+    model = your_custom_model(X, fitness)
+
+    # Fit the BoTorch model
+    mll = fit_gpytorch_model(model)
+
+    # Define the acquisition function
+    acq_function = qMaxValueEntropy(model)
+
+    # Optimize the acquisition function to find the next query point
+    candidate, _ = optimize_acqf(
+        acq_function,
+        bounds=your_custom_bounds,  # Specify the bounds for each feature
+        q=1,  # Number of candidates to sample
+    )
+
+    # Convert the candidate tensor to a numpy array
+    candidate = candidate.detach().numpy()
+
+    return fitness, candidate
 
     acq_fitness  = botorch.acquisition.qMaxValueEntropy(gpModel, candidate_solution)
     acq_behavior = [drag[0], lift[0]]
