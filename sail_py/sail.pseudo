@@ -1,3 +1,21 @@
+EVALUATION_BUDGET    = 1000
+SIZE_INITIAL_ARCHIVE = 50
+PARALLEL_BATCH_SIZE  = 10
+BEHAVORAL_NICHES = [
+    behavior_dim1 = define_dimension([0 ; 100], 10),
+    behavior_dim2 = define_dimension([-42; 42], 42),
+    behavior_dim3 = define_dimension([123;456], 78)
+]
+
+function define_dimension(interval, n_bins){
+    // Split dimension into n equally sized bins
+}
+
+function map_elites(eval_performance(), solution_archive){
+    // Perform MAP-Elites with user-defined 
+    // eval_behavior() function
+}
+
 function sail(){
 
     // 1: Generate initial solutions & train GP Model 
@@ -12,16 +30,17 @@ function sail(){
         
         acquisition_map      = map_elites(acquisition(), solution_archive)      // Calculate elite aquisition solutions
 
-        x_new                = sobol_select(acquisition_map, PARALLEL_BATCH_SIZE)        // Select acquisition elites
+        x_new                = sobol_select(acquisition_map, PARALLEL_BATCH_SIZE)           // Select acquisition elites
 
-        solution_archive    += x_new                                                     // Save acquisition elites
-        performance_archive += evaluate_performance(x_new)                               // Evaluate acquisition elites
-        EVALUATION_BUDGET   -= PARALLEL_BATCH_SIZE                                       // Decrease evaluation budget
-        gp_model             = train_gp(solution_archive, performance_archive)           // Train GP with new data
+        solution_archive    += x_new                                                        // Save acquisition elites
+        performance_archive += evaluate_performance(x_new)                                  // Evaluate acquisition elites
+        EVALUATION_BUDGET   -= PARALLEL_BATCH_SIZE                                          // Decrease evaluation budget
+        gp_model             = train_gp(solution_archive, performance_archive)              // Train GP with new data
 
     }
 
     // 3: Produce Prediction Map
-    predict_performance() = mean(gp_model)                                              // Use performance predictions (instead of evaluations)
-    prediction_map = map_elites(predict_performance(), solution_archive)                // Calculate elite perofrmance solutions
+    predict_performance() = mean(gp_model)                                                 // Use performance predictions (instead of evaluations)
+    prediction_map = map_elites(predict_performance(), solution_archive)                   // Calculate elite perofrmance solutions
+
 }
