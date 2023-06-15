@@ -28,19 +28,19 @@ function sail(){
     // 2: Produce Acquisition Map
     while (EVALUATION_BUDGET - PARALLEL_BATCH_SIZE >= 0){
         
-        acquisition_map      = map_elites(acquisition(), solution_archive)      // Calculate elite aquisition solutions
+        acquisition_map      = map_elites(acquisition(gp_model), solution_archive)        // Calculate elite aquisition solutions
 
-        x_new                = sobol_select(acquisition_map, PARALLEL_BATCH_SIZE)           // Select acquisition elites
+        x_new                = sobol_select(acquisition_map, PARALLEL_BATCH_SIZE)         // Select acquisition elites
 
-        solution_archive    += x_new                                                        // Save acquisition elites
-        performance_archive += evaluate_performance(x_new)                                  // Evaluate acquisition elites
-        EVALUATION_BUDGET   -= PARALLEL_BATCH_SIZE                                          // Decrease evaluation budget
-        gp_model             = train_gp(solution_archive, performance_archive)              // Train GP with new data
+        solution_archive    += x_new                                                      // Save acquisition elites
+        performance_archive += evaluate_performance(x_new)                                // Evaluate acquisition elites
+        EVALUATION_BUDGET   -= PARALLEL_BATCH_SIZE                                        // Decrease evaluation budget
+        gp_model             = train_gp(solution_archive, performance_archive)            // Train GP with new data
 
     }
 
     // 3: Produce Prediction Map
-    predict_performance() = mean(gp_model)                                                 // Use performance predictions (instead of evaluations)
-    prediction_map = map_elites(predict_performance(), solution_archive)                   // Calculate elite perofrmance solutions
+    predict_performance() = mean(gp_model)                                                // Use performance predictions (instead of evaluations)
+    prediction_map = map_elites(predict_performance(), solution_archive)                  // Calculate elite perofrmance solutions
 
 }
